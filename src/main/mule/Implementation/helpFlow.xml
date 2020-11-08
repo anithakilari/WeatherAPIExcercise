@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+	<flow name="helpFlow" doc:id="60acfd87-545e-48ae-8d98-05448988287a" >
+		<set-payload value='&lt;web:GetWeatherResponse xmlns:web="http://www.webserviceX.NET"&gt;
+         &amp;lt;![CDATA[&amp;amp;lt;NewDataSet&amp;amp;gt;
+    &amp;amp;lt;Location&amp;amp;gt;Melbourne&amp;amp;lt;/Location&amp;amp;gt;
+    &amp;amp;lt;Time&amp;amp;gt;11 AM&amp;amp;lt;/Time&amp;amp;gt;
+    &amp;amp;lt;Wind&amp;amp;gt;15 km per hour&amp;amp;lt;/Wind&amp;amp;gt;
+    &amp;amp;lt;Visibility&amp;amp;gt;10 km&amp;amp;lt;/Visibility&amp;amp;gt;
+    &amp;amp;lt;SkyConditions&amp;amp;gt;sunny&amp;amp;lt;/SkyConditions&amp;amp;gt;
+    &amp;amp;lt;Temperature&amp;amp;gt;18&amp;amp;lt;/Temperature&amp;amp;gt;
+    &amp;amp;lt;DewPoint&amp;amp;gt;2 C&amp;amp;lt;/DewPoint&amp;amp;gt;
+    &amp;amp;lt;RelativeHumidity&amp;amp;gt;35&amp;amp;lt;/RelativeHumidity&amp;amp;gt;
+    &amp;amp;lt;Status&amp;amp;gt;Normal&amp;amp;lt;/Status&amp;amp;gt;
+&amp;amp;lt;/NewDataSet&amp;amp;gt;]]&amp;gt;
+      &lt;/web:GetWeatherResponse&gt;' doc:name="Set Payload" doc:id="e045e4e4-7d62-4fed-aa81-6062c9b55a01" />
+		<ee:transform doc:name="Transform Message" doc:id="6558c3e4-90bf-48c9-804e-446c0011a593" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload replace "&lt;![CDATA[&amp;lt;" with '<']]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="8c93fcfa-39f6-4250-a987-7edde7e947fb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload replace "&amp;gt;" with '>']]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="76e58f4c-bb73-455f-918b-8d0025ca88df" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload replace "&amp;lt;" with '<']]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="a29b2e68-0bcd-4b67-aca6-9a16279d644e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	location: payload.GetWeatherResponse.NewDataSet.Location
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="55158f47-8af9-462c-b846-3bfe4a882841" message="PAYLOAD BEFORE CONVERSION: #[payload]" />
+	
+</flow>
+</mule>

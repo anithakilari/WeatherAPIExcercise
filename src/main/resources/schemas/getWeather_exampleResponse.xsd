@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="NewDataSet" maxOccurs="unbounded" minOccurs="1">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Location" type="xs:string" />
+        <xs:element name="Time" type="xs:string" />
+        <xs:element name="Wind" type="xs:string" />
+        <xs:element name="Visibility" type="xs:string" />
+        <xs:element name="SkyConditions" type="xs:string" />
+        <xs:element name="Temperature" type="xs:unsignedByte" />
+        <xs:element name="DewPoint" type="xs:string" />
+        <xs:element name="RelativeHumidity" type="xs:unsignedByte" />
+        <xs:element name="Status" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

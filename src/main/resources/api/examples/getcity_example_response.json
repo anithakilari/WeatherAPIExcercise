@@ -1,0 +1,21 @@
+{
+  "getCityByCountry": [
+    {
+      "country": "Australia",
+      "City": "Archerfield Aerodrome"
+    },
+    {
+      "country": "Australia",
+      "City": "Brisbane Airport M. O"
+    },
+    {
+      "country": "Australia",
+      "City": "Alice Springs Aerodrome"
+    },
+    {
+      "country": "Australia",
+      "City": "Amberley Aerodrome"
+    }
+  ],
+  "count": 4
+}

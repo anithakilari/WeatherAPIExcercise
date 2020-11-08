@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="object" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: object
+properties:
+    
+    queryParams:
+        properties:
+            "city":
+                type: string
+            "country":
+                type: string]]></types:shape>
+    </types:type>
+    <types:type name="city" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="country" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="getWeather" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="statusCode" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="exceptionMsg" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="GetWeatherResponse" format="xml">
+      <types:example format="xml" element="{http://www.webserviceX.NET}GetWeatherResponse" location="examples/GetWeatherResponse.xml"/>
+    </types:type>
+    <types:type name="GetWeatherResponseJson" format="json">
+      <types:shape format="json-schema" location="schemas/getweather_schema_response.json"/>
+    </types:type>
+    <types:type name="CityByCountry" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: object
+properties:
+    
+    queryParams:
+        properties:
+            "country":
+                type: string]]></types:shape>
+    </types:type>
+    <types:type name="GetCityByCountryResponse" format="xml">
+      <types:example format="xml" element="{http://www.webserviceX.NET}GetCitiesByCountryResponse" location="examples/GetCitiesByCountryResponse.xml"/>
+    </types:type>
+    <types:type name="newdatasetxml" format="xml">
+      <types:example format="xml" element="NewDataSet" location="examples/getWeather_exampleResponse.xml"/>
+    </types:type>
+    <types:type name="GetWeatherResponseXsd" format="xml">
+      <types:shape format="xml-schema" element="NewDataSet" location="schemas/getWeather_exampleResponse.xsd"/>
+    </types:type>
+    <types:type name="getCityxml" format="xml">
+      <types:example format="xml" element="NewDataSet" location="examples/getCity_exampleResponse.xml"/>
+    </types:type>
+    <types:type name="getCityJson" format="json">
+      <types:shape format="json-schema" location="schemas/getcity_schema_response-1.json"/>
+    </types:type>
+    <types:type name="mock" format="java">
+      <types:shape format="java" element="org.mule.extension.http.api.HttpRequestAttributes"/>
+    </types:type>
+    <types:type name="munit" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: object
+properties:
+    field1:
+        type: string
+    payload:
+        properties:
+            body:
+                type: string
+             ]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#446545c4-8379-474f-aff0-e6ff325ba515">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:attributes type="object"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#fe32488a-5892-4c3f-a001-8945811ebb99">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:attributes type="object"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#13e5bee0-72fc-4ba0-9676-47ac07e9ab68">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:attributes type="object"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:variables>
+          <types:variable name="country" type="country"/>
+          <types:variable name="qpCity" type="city"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ffc5bd96-dac9-459a-a0a9-2e81d31f926d">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:attributes type="object"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#0c50321b-e68d-4692-b276-755e572c8508">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:variables>
+          <types:variable name="exceptionMsg" type="exceptionMsg"/>
+          <types:variable name="statusCode" type="statusCode"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#9d2a4980-fba3-4e64-a00f-1993fb6832ed">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="newdatasetxml"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="GetWeatherResponseJson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#fdf7833a-2de6-411b-b2fe-d4fabd0cbae9">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="newdatasetxml"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#0e851137-575b-43c9-b5d7-c170bb440804">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="getCityxml"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="getCityJson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#6f2902b6-53c7-475c-b172-c15883c3d4d9">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="newdatasetxml"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="GetWeatherResponseJson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

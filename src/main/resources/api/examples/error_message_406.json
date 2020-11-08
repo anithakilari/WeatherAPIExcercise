@@ -1,0 +1,6 @@
+{
+   "type": "System Error",
+   "status": "406",
+   "statusCode": "Not acceptable",
+   "message": "The requested format in the headers is not acceptable."
+}

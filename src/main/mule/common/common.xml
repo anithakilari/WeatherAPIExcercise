@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf_commonBusinessException" doc:id="7a7c13e3-4f16-4919-b6bb-f731367c168c" >
+		<ee:transform doc:name="Genetrate Business Exception" doc:id="b7a9aded-2655-4769-8316-556fd892e17d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"type": "Business Exception",
+	statusCode: vars.statusCode,
+	message: vars.exceptionMsg
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="httpStatus" ><![CDATA[422]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="sf_commonErrorHandling" doc:id="8b16f005-6f2f-4035-9375-0b7b6a58ec32" >
+		<ee:transform doc:name="Transform Message" doc:id="e4a795d8-1eb7-4112-90f6-e8b424e271f0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"type": "System Error",
+	statusCode: vars.statusCode,
+	message: vars.exceptionMsg
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

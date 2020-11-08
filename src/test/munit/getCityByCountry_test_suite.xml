@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config name="getCityByCountryTestSuite.xml" />
+<munit:test name="new-test-suite-get_CityByCountry_RequestTest" doc:id="1d1c1d14-518f-49e0-8421-b93e03b36f54" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="71fbe169-0d2b-41b9-b990-1632dbbf2d0b" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Consume" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="e8fbe632-a01e-4e61-9acc-7ee69a38785b" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="GetCitiesByCountry" attributeName="operation" />
+					<munit-tools:with-attribute whereValue="Web_Service_Consumer_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/GetCityResponse.xml')]" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="41e3f5e3-7285-4b44-b137-ecf9d8fa6c5e" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Flow Reference" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="aa3144ac-0bd1-4b2c-867d-3d416cfde35d" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="sf_get_cityByCountry_Conversion" attributeName="name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/GetCityResponseMock.txt')]" mediaType="text/plain" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="8aaed238-a126-4d56-91d7-22cc07ba6fc8" >
+				<munit:attributes value="#[{queryParams : {country:'Australia' }}]" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to get_Weather_Request" doc:id="fd2814c0-8b66-4543-aeb2-3b268e5fc3f7" name="get_cityByCountry_Request"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="334a274a-33bc-4ab7-8b4d-c2fccde4e963" expression="#[payload.count]" is="#[output application/json --- MunitTools::equalTo('66')]" message="Number of cities returned not matching with expected."/>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="a277fa4d-d0f7-4774-a18f-ef66fd96595e" processor="wsc:consume" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Consume" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="a09dc4d0-f125-4b69-a50e-24868d169108" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="GetWeather" attributeName="operation" />
+					<munit-tools:with-attribute whereValue="Web_Service_Consumer_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				
+				
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="new-test-suite-get_CityByCountry_MandatoryQueryParamatersTest" doc:id="f3ec726a-ed95-4403-bb00-d8e3f36f567d" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="69525dab-c1c7-49a4-ac59-0a5a438354e3" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Consume" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="e8fbe632-a01e-4e61-9acc-7ee69a38785b" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="GetCitiesByCountry" attributeName="operation" />
+					<munit-tools:with-attribute whereValue="Web_Service_Consumer_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/GetCityResponse.xml')]" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="973e92be-ad36-407c-bd11-568b810c673e" >
+				<munit:attributes value="#[{queryParams : {country:'Australia' }}]" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to get_Weather_Request" doc:id="297105fa-032e-4d3e-91db-19221541163e" name="get_cityByCountry_Request"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="9c05cd0c-9647-4243-b5e7-0c1a4936f924" expression="#[payload.message]" is="#[output application/json --- MunitTools::equalTo('No cities found')]"/>
+		</munit:validation>
+	</munit:test>
+<munit:test name="new-test-suite-get_CityByCountry_BusinessExceptionTest" doc:id="5ebecbc3-7b12-4ac2-a339-c2293e1ff512" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8d80be8d-df90-4bd4-9808-91fc6f568c29" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Consume" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="e8fbe632-a01e-4e61-9acc-7ee69a38785b" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="GetCitiesByCountry" attributeName="operation" />
+					<munit-tools:with-attribute whereValue="Web_Service_Consumer_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/GetEmptyCityResponse.xml')]" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="354a7c0d-fe5d-49d5-9d04-91553bdd11c6" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Flow Reference" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="aa3144ac-0bd1-4b2c-867d-3d416cfde35d" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="sf_get_cityByCountry_Conversion" attributeName="name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/GetEmptyResponseMock.txt')]" mediaType="text/plain" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ad5e4d31-e225-4e97-a905-3cc21215a47f" >
+				<munit:attributes value="#[{queryParams : {country:''}}]" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to get_Weather_Request" doc:id="824757a9-75e6-4be6-9fc5-9e2f99f5643e" name="get_cityByCountry_Request"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b66986e1-7a43-4002-9fac-e3ea77b2d689" expression="#[payload]" is="#[output application/json --- MunitTools::equalTo('Please Proivide Country Name')]"/>
+		</munit:validation>
+	</munit:test>
+
+</mule>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<sub-flow name="get_Weather_Request" doc:id="80043199-5220-4653-8522-d621819a34b5" >
+		<ee:transform doc:name="Initialize Variables" doc:id="11bfb322-1872-4b24-adb7-4990700ac844" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+var qpCountry = attributes.queryParams.country
+---
+{
+	qpCountry: qpCountry
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="qpCountry" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.queryParams.country]]></ee:set-variable>
+				<ee:set-variable variableName="qpCity" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.queryParams.city]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Generate request Message" doc:id="e2b2229a-8f07-41a8-b78d-c70849e0bc98" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.webserviceX.NET
+---
+{
+	ns0#GetWeather: {
+		ns0#CountryName: vars.qpCountry,
+		ns0#CityName: vars.qpCity
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Log Request" doc:id="5a3b33a2-1a74-4851-b9d4-c8989bcf5cca" message="#[payload]"/>
+		<wsc:consume doc:name="Consume" doc:id="a09dc4d0-f125-4b69-a50e-24868d169108" operation="GetWeather" config-ref="Web_Service_Consumer_Config">
+		</wsc:consume>
+		<logger level="INFO" doc:name="Log Raw Response" doc:id="95cc6867-1980-4287-8588-b24dd4af327e" message="#[payload]"/>
+		<flow-ref doc:name="TextConversion" doc:id="82a546aa-d7fe-427e-8fe8-cb68d94fcdf7" name="sf_get_Weather_Conversion"/>
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="37c26e3d-1153-47e9-aeb1-637b963a0e4c" doc:name="Removing Spaces">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+ns ns0 http://www.webserviceX.NET
+---
+trim(payload)]]></ee:set-payload>
+            </ee:message>
+            <ee:variables>
+		 	</ee:variables>
+        </ee:transform>
+		<choice doc:name="Choice" doc:id="af4fa38b-05c7-486c-bc69-ddc7a0f11117" >
+			<when expression="#[payload== '']">
+				<ee:transform doc:name="Initialize Variables" doc:id="6f7664d5-ed06-40ea-8fe4-8fe375fe3501" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"Request Not Found"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/java
+---
+"No Data Found"]]></ee:set-variable>
+						<ee:set-variable variableName="exceptionMsg" ><![CDATA[%dw 2.0
+output application/java
+---
+"No Weather information found"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference" doc:id="7b6ca1bb-12b5-49ee-81ea-4bfeda646f5e" name="sf_commonBusinessException"/>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="940cd6ed-9672-48fd-a9b8-9342d41b8cc7">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+ns ns0 http://www.webserviceX.NET
+---
+payload replace "<![CDATA[" with ''
+
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="c4133925-bb2e-40c3-81cd-d35e7fe64ace">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload replace "&gt;]]" with '']]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="9b22fde9-f829-4405-ad90-a95343800af0">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload replace "&gt;" with '>']]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="50647d08-cb96-47ff-96cb-a284a80aa90b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload replace "&lt;" with '<']]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<logger level="INFO" doc:name="XML Logging" doc:id="c48ae313-86d7-418b-82c4-cea3be659135" message="#[payload]" />
+				<set-payload value="#[payload]" doc:name="Set Payload" doc:id="af718a05-43fd-42be-9154-c5cff2684430" mimeType="application/xml"/>
+				<ee:transform doc:name="Transform Message" doc:id="6f2902b6-53c7-475c-b172-c15883c3d4d9" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://www.webserviceX.NET
+---
+{
+	Location: payload.NewDataSet.Location,
+	Time: payload.NewDataSet.Time,
+	Wind: payload.NewDataSet.Wind,
+	Visibility: payload.NewDataSet.Visibility,
+	SkyConditions: payload.NewDataSet.SkyConditions,
+	Temperature: payload.NewDataSet.Temperature as String,
+	DewPoint: payload.NewDataSet.DewPoint,
+	RelativeHumidity: payload.NewDataSet.RelativeHumidity as String,
+	Status: payload.NewDataSet.Status
+}
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="374f53b4-3238-40ab-a994-9df9d9d09f5a" message='#[payload]'/>
+			
+</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="sf_get_Weather_Conversion" doc:id="24736513-6209-41af-96d2-1be31abbc6d2" >
+		<ee:transform doc:name="Transform to Plain text" doc:id="0913024f-9cbf-4dec-a15f-b238e25bfe66">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+ns ns0 http://www.webserviceX.NET
+---
+write(payload.body.GetWeatherResponse, "text/plain")
+
+
+
+]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+					</ee:variables>
+				</ee:transform>
+	</sub-flow>
+
+</mule>

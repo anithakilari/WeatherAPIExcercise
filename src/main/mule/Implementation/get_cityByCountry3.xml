@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<sub-flow name="get_cityByCountry_Request" doc:id="f9da49eb-a5d5-495e-80c0-635f6a988905" >
+		<ee:transform doc:name="Initialize Variables" doc:id="fe65971b-785d-4836-8219-c18b0753679c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+var qpCountry = attributes.queryParams.country
+---
+{
+	qpCountry: qpCountry
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="qpCountry" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.queryParams.country]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Generate request Message" doc:id="b56c2b71-2eeb-428f-8a0f-bd7c0f125499" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.webserviceX.NET
+---
+{
+	ns0#GetCitiesByCountry: {
+		ns0#CountryName: vars.qpCountry
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Log Request" doc:id="cad70d7b-9c83-43c4-85fc-c14031ce5afe" message="#[payload]"/>
+		<choice doc:name="Choice" doc:id="9dbdf814-0acb-4db3-908e-b58592ad7a77" >
+			<when expression="#[vars.qpCountry=='']">
+				<set-payload value="Please Proivide Country Name" doc:name="Set Payload" doc:id="cf9eb798-31c9-418b-98b0-fbc4f2b2f0e7" />
+			</when>
+			<otherwise>
+					<wsc:consume doc:name="Consume" doc:id="e8fbe632-a01e-4e61-9acc-7ee69a38785b" operation="GetCitiesByCountry" config-ref="Web_Service_Consumer_Config">
+			<wsc:message-customizations forceXMLProlog="true" />
+		</wsc:consume>
+		<logger level="INFO" doc:name="Log Raw Response" doc:id="d2ed608a-5e1f-49d1-873d-91b74abc31d2" message="#[payload]"/>
+				<flow-ref doc:name="Flow Reference" doc:id="aa3144ac-0bd1-4b2c-867d-3d416cfde35d" name="sf_get_cityByCountry_Conversion"/>
+				<ee:transform doc:name="Removing Spaces" doc:id="f5f5be1d-95cd-40d6-bfc8-467032ce2200">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+ns ns0 http://www.webserviceX.NET
+---
+trim(payload)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<choice doc:name="Choice" doc:id="7db71cf6-d277-4aa1-bf89-70f9d3c347be" >
+			<when expression="#[payload=='']">
+				<ee:transform doc:name="Initialize Variables" doc:id="9528424f-3a84-463a-851c-759a27fc6d5f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/java
+---
+"No Data Found"]]></ee:set-variable>
+						<ee:set-variable variableName="exceptionMsg" ><![CDATA[%dw 2.0
+output application/java
+---
+"No cities found"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference" doc:id="42de70ca-ef41-4622-a942-70417bc659a9" name="sf_commonBusinessException"/>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="12a017d9-6635-461d-8e2f-2765ee11cccd">
+					<ee:message>
+						<ee:set-payload><![CDATA[output application/java
+ns ns0 http://www.webserviceX.NET
+---
+payload replace "<![CDATA[" with ''
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+						<ee:transform doc:name="Transform Message" doc:id="68790723-1b39-47f1-8adf-968e2d7c676c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload replace "&gt;]]" with ''
+
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="5b7ac0f5-8cca-4bcf-b79f-bfebefa8c0b8">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload replace "&gt;" with '>']]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="5058c4ef-b911-4df1-9771-034aeb98aa8c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload replace "&lt;" with '<']]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="XML Logging" doc:id="d97a5cf5-8914-4c6d-ada4-25d60de200d9" message='#[payload]'/>
+				<set-payload value="#[payload]" doc:name="Set Payload" doc:id="1360eb2d-680c-4144-ab3d-f051de927e0e" mimeType="application/xml"/>
+				<logger level="INFO" doc:name="Logger" doc:id="d3d9861f-b43b-4905-ab5a-3ca0fcb52767" message="#[payload]" />
+						<ee:transform doc:name="Transform Message" doc:id="dd9b7499-6163-44df-9b27-570d077e9052" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	cities: payload.NewDataSet.*Table.City,
+	count: sizeOf(payload.NewDataSet.*Table.City)
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+						<logger level="INFO" doc:name="Logger" doc:id="24b2b3d1-4be0-4190-9dd6-19129701026f" message="#[payload]" />
+			</otherwise>
+		</choice>
+			</otherwise>
+		</choice>
+
+	</sub-flow>
+	<sub-flow name="sf_get_cityByCountry_Conversion" doc:id="9a68d6be-23b7-4fb5-8d8b-d509e6f3babc" >
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="79ecd35e-28d9-44a2-9e6e-cb86f5ff11c0" doc:name="Transform to plain text">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+ns ns0 http://www.webserviceX.NET
+---
+write(payload.body.GetCitiesByCountryResponse, "text/plain")]]></ee:set-payload>
+            </ee:message>
+            <ee:variables>
+		 	</ee:variables>
+        </ee:transform>
+	</sub-flow>
+</mule>

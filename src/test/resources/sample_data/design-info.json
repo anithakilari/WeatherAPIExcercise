@@ -1,0 +1,10 @@
+{
+  "sampleData": {
+    "13e5bee0-72fc-4ba0-9676-47ac07e9ab68": {
+      "attributes": "sample_data/queryparam.dwl"
+    },
+    "6f2902b6-53c7-475c-b172-c15883c3d4d9": {
+      "payload": "sample_data/defaultstringtype.xml"
+    }
+  }
+}

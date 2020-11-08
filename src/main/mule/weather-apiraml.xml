@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <http:listener-config name="weather-apiraml-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="weather-apiraml-config" api="weather-apiraml.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="weather-apiraml-main">
+        <http:listener config-ref="weather-apiraml-httpListenerConfig" path="/api/*" allowedMethods="GET" doc:name="HTTPListener">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="weather-apiraml-config" />
+        <error-handler>
+            <on-error-propagate doc:name="400" enableNotifications="true" logException="true" type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+						<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+						<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/java
+---
+"Bad Request"]]></ee:set-variable>
+						<ee:set-variable variableName="exceptionMsg" ><![CDATA[%dw 2.0
+output application/java
+---
+"Unable to Process the Request"]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+				<flow-ref doc:name="Call CommonErrorHandling" doc:id="54fa7255-2c98-4274-baa1-5b7cd63462f5" name="sf_commonErrorHandling"/>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND" doc:name="404">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: message."Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+						<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/java
+---
+"Resource Not Found"]]></ee:set-variable>
+						<ee:set-variable variableName="exceptionMsg" ><![CDATA[%dw 2.0
+output application/java
+---
+"The requested resource is not found."]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+				<flow-ref doc:name="Call CommonErrorHandling" doc:id="97a97c18-10ab-412c-bc3f-3d2ae5ff1d56" name="sf_commonErrorHandling"/>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED" doc:name="405">
+				<ee:transform doc:name="Transform Message" doc:id="91aef4c6-b481-4f12-9eca-740a3385ca75" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: message."Method not allowed"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/java
+---
+"Method not allowed"]]></ee:set-variable>
+						<ee:set-variable variableName="httpStatus" ><![CDATA[405]]></ee:set-variable>
+						<ee:set-variable variableName="exceptionMsg" ><![CDATA[%dw 2.0
+output application/java
+---
+"The request method  is not supported for the requested resource."]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Call CommonErrorHandling" doc:id="2d2859ac-5f11-48fa-a100-66fd543e1235" name="sf_commonErrorHandling" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE" doc:name="406">
+               <ee:transform doc:name="Transform Message" doc:id="3050485c-42ef-41ad-a77e-58b18ece0e16" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: message."Not acceptable"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/java
+---
+"Not acceptable"]]></ee:set-variable>
+						<ee:set-variable variableName="httpStatus" ><![CDATA[406]]></ee:set-variable>
+						<ee:set-variable variableName="exceptionMsg" ><![CDATA[%dw 2.0
+output application/java
+---
+"The requested format in the headers is not acceptable."]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Call CommonErrorHandling" doc:id="da3824a9-596e-4450-aa0e-f580cac79145" name="sf_commonErrorHandling" />
+          </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:name="415">
+                              <ee:transform doc:name="Transform Message" doc:id="7c26b851-1a91-4abf-b5ec-c93b5019e565" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: message."Unsupported media type"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/java
+---
+"Unsupported media type"]]></ee:set-variable>
+						<ee:set-variable variableName="httpStatus" ><![CDATA[415]]></ee:set-variable>
+						<ee:set-variable variableName="exceptionMsg" ><![CDATA[%dw 2.0
+output application/java
+---
+"The request has a media type that is not supported."]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Call CommonErrorHandling" doc:id="6f433e66-2277-4f3d-af53-c5b66bc016fa" name="sf_commonErrorHandling" />
+         
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED" doc:name="500">
+    <ee:transform doc:name="Transform Message" doc:id="768e72d7-382c-477b-a3fb-bba8e9f0d5b5" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: message."Internal Server Error"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/java
+---
+"Internal Server Error"]]></ee:set-variable>
+						<ee:set-variable variableName="httpStatus" ><![CDATA[406]]></ee:set-variable>
+						<ee:set-variable variableName="exceptionMsg" ><![CDATA[%dw 2.0
+output application/java
+---
+"Try again later."]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Call CommonErrorHandling" doc:id="ab24f31d-a1e6-43ae-bf6e-a2dc78f734be" name="sf_commonErrorHandling" />
+       
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="weather-apiraml-console">
+        <http:listener config-ref="weather-apiraml-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="weather-apiraml-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\city:weather-apiraml-config">
+		<logger level="INFO" doc:name="Logger" doc:id="bdb1fe28-386b-40a7-83e1-0a591482f3f4" message="Request message received" />
+		<flow-ref doc:name="GetCitiesInCountry" doc:id="946acb61-3b7c-43af-a797-f6a9720ee800" name="get_cityByCountry_Request" />
+		<error-handler ref="globalExceptionHandling" />
+    </flow>
+	<flow name="get:\weather:weather-apiraml-config">
+		<logger level="INFO" doc:name="Logger" doc:id="f97ae7ac-2760-4d04-b2d9-7b2719983468" message="Request message received" />
+		<flow-ref doc:name="GetWeatherResults" doc:id="c5928742-6b57-4e9b-ac66-f228088acf0a" name="get_Weather_Request"/>
+		<error-handler ref="globalExceptionHandling" />
+    </flow>
+</mule>

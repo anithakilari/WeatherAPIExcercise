@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="new-test-suite.xml" />
+		<munit:test name="new-test-suite-get_Weather_RequestTest" doc:id="20254ef7-84fb-4427-88a1-4b589a27d791" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8e0cefbf-f1eb-4638-9ae3-ab701497d63a" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Consume" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="a09dc4d0-f125-4b69-a50e-24868d169108" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="GetWeather" attributeName="operation" />
+					<munit-tools:with-attribute whereValue="Web_Service_Consumer_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/GetWeatherResponse.xml')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="dbefb903-bb1d-467c-b8fe-c6d2d6cab170" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="TextConversion" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="82a546aa-d7fe-427e-8fe8-cb68d94fcdf7" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="sf_get_Weather_Conversion" attributeName="name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/GetWeatherResponseMock.txt')]" mediaType="text/plain" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="6ad8f8bf-0a6b-4111-afe4-843a97be3d73" >
+				<munit:attributes value="#[{queryParams : {country:'Australia' , city:'Melbourne'}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to get_Weather_Request" doc:id="13885fe2-01c8-4088-8386-da9abde65b48" name="get_Weather_Request"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="fda2d7af-0c96-490c-b9f0-7ccb3046a24e" expression="#[payload.Location]" is="#[output application/json --- MunitTools::equalTo('Melbourne')]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="new-test-suite-get_Weather_BusinessExceptionTest" doc:id="93a499e1-dcf3-4ae0-b23d-0e67bead027b" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="85507ff0-24c3-4a89-8cc9-4d870c312acd" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Consume" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="a09dc4d0-f125-4b69-a50e-24868d169108" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="GetWeather" attributeName="operation" />
+					<munit-tools:with-attribute whereValue="Web_Service_Consumer_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/GetEmptyWeatherResponse.xml')]" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="235a904d-9e64-46c1-bef3-fef24adeba7c" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="TextConversion" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="82a546aa-d7fe-427e-8fe8-cb68d94fcdf7" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="sf_get_Weather_Conversion" attributeName="name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/GetEmptyResponseMock.txt')]" mediaType="text/plain" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="b8552862-8f02-473b-b9c2-11982ba5d3e1" >
+				<munit:attributes value="#[{queryParams : {country:'Australia' , city:'Melbourne'}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to get_Weather_Request" doc:id="6c42ed9a-808b-4f47-be61-ce6277266308" name="get_Weather_Request"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="119e3d3e-5efc-46e2-967d-975878509a5c" expression="#[payload.message]" is="#[output application/json --- MunitTools::equalTo('No Weather information found')]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
