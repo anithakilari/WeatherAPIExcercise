@@ -39,7 +39,7 @@
 			<flow-ref doc:name="Flow-ref to get_Weather_Request" doc:id="13885fe2-01c8-4088-8386-da9abde65b48" name="get_Weather_Request"/>
 		</munit:execution>
 		<munit:validation >
-			<munit-tools:assert-that doc:name="Assert that" doc:id="fda2d7af-0c96-490c-b9f0-7ccb3046a24e" expression="#[payload.Location]" is="#[output application/json --- MunitTools::equalTo('Melbourne')]"/>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="fda2d7af-0c96-490c-b9f0-7ccb3046a24e" expression='#[output application/java ---(write(payload, "application/json") as String)]' is="#[output application/json --- MunitTools::equalTo(MunitTools::getResourceAsStream('sample_data/getweather_example_response.json') replace '\r' with '')]"/>
 		</munit:validation>
 	</munit:test>
 	<munit:test name="new-test-suite-get_Weather_BusinessExceptionTest" doc:id="93a499e1-dcf3-4ae0-b23d-0e67bead027b" description="Test">

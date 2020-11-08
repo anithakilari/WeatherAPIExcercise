@@ -43,17 +43,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 			<flow-ref doc:name="Flow-ref to get_Weather_Request" doc:id="fd2814c0-8b66-4543-aeb2-3b268e5fc3f7" name="get_cityByCountry_Request"/>
 		</munit:execution>
 		<munit:validation >
-			<munit-tools:assert-that doc:name="Assert that" doc:id="334a274a-33bc-4ab7-8b4d-c2fccde4e963" expression="#[payload.count]" is="#[output application/json --- MunitTools::equalTo('66')]" message="Number of cities returned not matching with expected."/>
-			<munit-tools:verify-call doc:name="Verify call" doc:id="a277fa4d-d0f7-4774-a18f-ef66fd96595e" processor="wsc:consume" atLeast="1">
-				<munit-tools:with-attributes >
-					<munit-tools:with-attribute whereValue="Consume" attributeName="doc:name" />
-					<munit-tools:with-attribute whereValue="a09dc4d0-f125-4b69-a50e-24868d169108" attributeName="doc:id" />
-					<munit-tools:with-attribute whereValue="GetWeather" attributeName="operation" />
-					<munit-tools:with-attribute whereValue="Web_Service_Consumer_Config" attributeName="config-ref" />
-				</munit-tools:with-attributes>
-				
-				
-			</munit-tools:verify-call>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="334a274a-33bc-4ab7-8b4d-c2fccde4e963" expression='#[output application/java ---(write(payload, "application/json") as String)]' is="#[output application/json --- MunitTools::equalTo(MunitTools::getResourceAsStream('sample_data/getCityResponse.json') replace '\r' with '')]" message="Number of cities returned not matching with expected."/>
 		</munit:validation>
 	</munit:test>
 	<munit:test name="new-test-suite-get_CityByCountry_MandatoryQueryParamatersTest" doc:id="f3ec726a-ed95-4403-bb00-d8e3f36f567d" description="Test">

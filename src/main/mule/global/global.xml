@@ -5,8 +5,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="c014d534-a602-43f3-9828-e7a05dd3ce83" >
-		<wsc:connection wsdlLocation="global-weather.wsdl" service="GlobalWeather" port="GlobalWeatherSoap" address="http://localhost:8080/GlobalWeather" >
+		<wsc:connection wsdlLocation="global-weather.wsdl" service="GlobalWeather" port="GlobalWeatherSoap" address="${wsdl.wsdlUrl}" >
 			<wsc:web-service-security actor="http://schemas.xmlsoap.org/soap/actor/next" />
 		</wsc:connection>
 	</wsc:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="15e580f9-26a3-48d3-a01b-1bd65e1fb21e" file="properties\weather-${env}.yaml" />
+	<global-property doc:name="Global Property" doc:id="c2e12d57-88a0-4876-95af-1ac343048911" name="env" value="local" />
 </mule>
